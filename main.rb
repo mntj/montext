@@ -26,7 +26,7 @@ end
 def parse_msg(user_msg)
     msg_arr = user_msg.to_s.split(" ")
     {
-      exchange: "XNAS"
+      exchange: "XNAS",
       ticker: msg_arr.first.upcase,
       element_arr: msg_arr[1..-1]
     }
@@ -67,11 +67,21 @@ def error_message
   "Sorry! Didn't recognize that. "
 end
 
-def xignite_response(exchange:, ticker:)
-  uri = XIGNITE_BASE_URL + ticker + "." + exchange
+def xignite_response(request)
+  exchange = request[:exchange]
+  ticker   = request[:ticker]
+  elements = request[:element_arr]
+
+  if !elements.empty?
+    ele_str = elements.map(&:downcase).map(&:capitalize).join(",")
+  end
+
+
+  uri = XIGNITE_URL << ticker << "." << exchange << "&_fields=" << ele_str
+  binding.pry
   HTTParty.get(uri)
 end
 
-XIGNITE_BASE_URL = "http://globalquotes.xignite.com/v3/xGlobalQuotes.json" <<
-"/GetGlobalDelayedQuote?IdentifierType=Symbol&_token=" <<
-"#{ENV["XIGNITE_TOKEN"]}&Identifier="
+XIGNITE_URL = "http://globalquotes.xignite.com/v3/xGlobalQuotes.json" <<
+  "/GetGlobalDelayedQuote?IdentifierType=Symbol&_token=" <<
+  "#{ENV["XIGNITE_TOKEN"]}&Identifier="
