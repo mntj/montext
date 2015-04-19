@@ -32,14 +32,28 @@ def parse_msg(user_msg)
     }
 end
 
+def xignite_response(request)
+  exchange = request[:exchange]
+  ticker   = request[:ticker]
+  elements = request[:element_arr]
+
+  elements.map!(&:downcase).map!(&:capitalize)
+
+  uri = XIGNITE_URL << ticker << "." << exchange
+  res = HTTParty.get(uri)
+
+  res[:ticker]   = ticker
+  res[:exchange] = exchange
+  res[:elements] = elements
+
+  return res
+end
+
 def create_reply(response)
   r = response
 
   if successful?(r)
-    "Name --- #{r["Security"]["Name"]}\n" <<
-    "Ask  --- #{r["Ask"]}\n" <<
-    "High --- #{r["High"]}\n" <<
-    "Low  --- #{r["Low"]}"
+
   elsif session["count"] == 0
     new_message << help_message
   elsif r["Message"]
@@ -67,21 +81,25 @@ def error_message
   "Sorry! Didn't recognize that. "
 end
 
-def xignite_response(request)
-  exchange = request[:exchange]
-  ticker   = request[:ticker]
-  elements = request[:element_arr]
-
-  if !elements.empty?
-    ele_str = elements.map(&:downcase).map(&:capitalize).join(",")
-  end
-
-
-  uri = XIGNITE_URL << ticker << "." << exchange << "&_fields=" << ele_str
-  binding.pry
-  HTTParty.get(uri)
-end
-
 XIGNITE_URL = "http://globalquotes.xignite.com/v3/xGlobalQuotes.json" <<
   "/GetGlobalDelayedQuote?IdentifierType=Symbol&_token=" <<
   "#{ENV["XIGNITE_TOKEN"]}&Identifier="
+
+def accepted_elements
+  [
+    "Outcome",
+    "Message",
+    "Delay",
+    "Date",
+    "Time",
+    "Open",
+    "Close",
+    "High",
+    "Low",
+    "Last",
+    "Volume",
+    "PreviousClose",
+    "PreviousCloseDate",
+
+  ]
+end
