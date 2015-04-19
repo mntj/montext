@@ -8,6 +8,7 @@ get '/' do
 end
 
 get '/inbound' do
+  session[:exchange] ||= "XNAS"
   session["count"] ||= 0
   user_msg_body = params["Body"]
 
@@ -25,14 +26,23 @@ end
 
 def parse_msg(user_msg)
     msg_arr = user_msg.to_s.split(" ")
+
+    if msg_arr.first.downcase == "set"
+      exchange = msg_arr.last.upcase
+      session[:exchange] = exchange
+      return {:new_exchange => exchange}
+    end
+
     {
-      exchange: "XNAS",
+      exchange: session[:exchange],
       ticker: msg_arr.first.upcase,
       element_arr: msg_arr[1..-1]
     }
 end
 
 def xignite_response(request)
+  return "New exchange" if request[:new_exchange]
+
   exchange = request[:exchange]
   ticker   = request[:ticker]
   elements = request[:element_arr]
@@ -51,6 +61,10 @@ end
 
 def create_reply(response)
   r = response
+
+  if r == "New exchange"
+    return "Exchange set to #{session[:exchange]}"
+  end
 
   if successful?(r)
     display_response(r)
