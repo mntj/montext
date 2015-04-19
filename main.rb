@@ -1,8 +1,6 @@
 require 'bundler'
 Bundler.require
 
-require_relative 'config.rb'
-
 enable :sessions
 
 get '/' do
@@ -11,11 +9,13 @@ end
 
 get '/inbound' do
   session["count"] ||= 0
-  body = params["Body"]
+  user_msg_body = params["Body"]
 
   twiml = Twilio::TwiML::Response.new do |r|
     r.Message do |msg|
-      msg.Body create_reply(body)
+      request = parse_msg(user_msg_body)
+      resp = xignite_response(request)
+      msg.Body create_reply(resp)
     end
   end
 
@@ -23,8 +23,17 @@ get '/inbound' do
   twiml.text
 end
 
-def create_reply(input)
-  r = data_response(exchange: "XNAS", ticker: input)
+def parse_msg(user_msg)
+    msg_arr = user_msg.to_s.split(" ")
+    {
+      exchange: "XNAS"
+      ticker: msg_arr.first.upcase,
+      element_arr: msg_arr[1..-1]
+    }
+end
+
+def create_reply(response)
+  r = response
 
   if successful?(r)
     "Name --- #{r["Security"]["Name"]}\n" <<
@@ -58,7 +67,7 @@ def error_message
   "Sorry! Didn't recognize that. "
 end
 
-def data_response(exchange:, ticker:)
+def xignite_response(exchange:, ticker:)
   uri = XIGNITE_BASE_URL + ticker + "." + exchange
   HTTParty.get(uri)
 end
