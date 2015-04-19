@@ -84,11 +84,13 @@ def successful?(response)
 end
 
 def new_message
-  "Welcome to Montext! "
+  "Welcome to Montext! Financial info through SMS"
 end
 
 def help_message
-  "Enter a stock symbol to get information about it. "
+  "Enter a company symbol to get info about it. For example, 'FB'" <<
+  "Or enter a symbol and certain attributes: 'FB Open Close'" <<
+  "You can also set the exchange, e.g. 'Set exchange XNSE'"
 end
 
 def error_message
