@@ -4,7 +4,7 @@ Bundler.require
 enable :sessions
 
 get '/' do
-  "Welcome to Montext!"
+  "Welcome to Montext! Get financial info through SMS. Text +1 954-621-3373 to get started."
 end
 
 get '/inbound' do
@@ -84,12 +84,12 @@ def successful?(response)
 end
 
 def new_message
-  "Welcome to Montext! Financial info through SMS"
+  "Welcome to Montext! Financial info through SMS\n"
 end
 
 def help_message
-  "Enter a company symbol to get info about it. For example, 'FB'" <<
-  "Or enter a symbol and certain attributes: 'FB Open Close'" <<
+  "Enter a company symbol to get info about it. For example, 'FB' \n" <<
+  "Or enter a symbol and certain attributes: 'FB Open Close' \n" <<
   "You can also set the exchange, e.g. 'Set exchange XNSE'"
 end
 
