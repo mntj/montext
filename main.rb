@@ -24,22 +24,6 @@ get '/inbound' do
   twiml.text
 end
 
-def parse_msg(user_msg)
-    msg_arr = user_msg.to_s.split(" ")
-
-    if msg_arr.first.downcase == "set"
-      exchange = msg_arr.last.upcase
-      session[:exchange] = exchange
-      return {:new_exchange => exchange}
-    end
-
-    {
-      exchange: session[:exchange],
-      ticker: msg_arr.first.upcase,
-      element_arr: msg_arr[1..-1]
-    }
-end
-
 def xignite_response(request)
   return "New exchange" if request[:new_exchange]
 
