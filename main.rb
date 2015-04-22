@@ -24,25 +24,6 @@ get '/inbound' do
   twiml.text
 end
 
-def xignite_response(request)
-  return "New exchange" if request[:new_exchange]
-
-  exchange = request[:exchange]
-  ticker   = request[:ticker]
-  elements = request[:element_arr]
-
-  elements.map!(&:downcase).map!(&:capitalize)
-
-  uri = XIGNITE_URL + ticker + "." + exchange
-  res = HTTParty.get(uri)
-
-  res[:ticker]   = ticker
-  res[:exchange] = exchange
-  res[:elements] = elements
-
-  return res
-end
-
 def create_reply(response)
   r = response
 
