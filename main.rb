@@ -37,8 +37,6 @@ def create_reply(response)
     new_message << help_message
   elsif r["Message"]
     r["Message"]
-  elsif input.strip.downcase == "commands"
-    help_message
   else
     error_message << help_message
   end
