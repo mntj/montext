@@ -24,28 +24,6 @@ get '/inbound' do
   twiml.text
 end
 
-def create_reply(response)
-  r = response
-
-  if r == "New exchange"
-    return "Exchange set to #{session[:exchange]}"
-  end
-
-  if successful?(r)
-    display_response(r)
-  elsif session["count"] == 0
-    new_message << help_message
-  elsif r["Message"]
-    r["Message"]
-  else
-    error_message << help_message
-  end
-end
-
-def successful?(response)
-  !response["Outcome"].include? "Error"
-end
-
 def new_message
   "Welcome to Montext! Financial info through SMS\n"
 end
